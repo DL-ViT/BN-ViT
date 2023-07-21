@@ -9,6 +9,11 @@ Test results on DeiT_Tiny are shown below, corrsponding to Figure 2 in paper.
 <img width=30% src="img/plot_2.png"/>
 </div>
 
+## Requirements
+
+-   pytorch == 1.13.1
+-   timm == 0.9.2
+
 ## Usage
 
 ```python

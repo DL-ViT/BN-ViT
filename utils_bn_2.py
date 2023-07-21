@@ -22,10 +22,6 @@ class BN_MLP(timm.layers.Mlp):
     BN_MLP: add BN_bnc in-between 2 linear layers in MLP module
     """
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.norm = BN_bnc(kwargs['hidden_features'])
-
     def forward(self, x):
         x = self.fc1(x)
         x = self.norm(x)  # apply batch normalization before activation
@@ -47,12 +43,8 @@ def replace_BN(model):
         if isinstance(module, Block):
             module.norm1 = BN_bnc(module.norm1.normalized_shape)
             module.norm2 = BN_bnc(module.norm2.normalized_shape)
-            module.mlp = BN_MLP(in_features=module.mlp.fc1.in_features,
-                                hidden_features=module.mlp.fc1.out_features,
-                                out_features=module.mlp.fc2.out_features,
-                                act_layer=module.mlp.act.__class__,
-                                bias=module.mlp.fc1.bias,
-                                drop=module.mlp.drop1.p)
+            module.mlp.norm = BN_bnc(module.mlp.fc1.out_features)
+            setattr(module.mlp, '__class__', BN_MLP)
 
     return model
 
